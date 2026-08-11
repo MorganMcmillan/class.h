@@ -66,6 +66,14 @@
 // Interfaces and virtual methods
 // --------------------
 
+// Defines an interface as a class-vtable pointer pair.
+#define interface(Interface, vtable_def)                                       \
+    typedef struct vtable_def Interface##_vtable;                              \
+    typedef struct {                                                           \
+        void *super;                                                           \
+        Interface##_vtable *vtable;                                            \
+    } Interface;
+
 // Declares/defines a virtual method for a class-vtable pair.
 #define virtual(name, ...) (*name)(void *self, __VA_ARGS__)
 
@@ -79,18 +87,17 @@
 // Casts a function to a virtual table entry, without extra arguments.
 #define vcast0(name, ret_type) (ret_type (*)(void *)) name
 
+// Calls a virtual method.
+// This is meant only to be called inside an interface method.
 #define vcall(self, name, ...)                                                 \
     (*self->vtable->name)((void *)self->super, __VA_ARGS__)
 
+// Calls a virtual method without any extra arguments.
+// This is meant only to be called inside an interface method.
 #define vcall0(self, name) (*self->vtable->name)((void *)self->super)
 
-// Defines an interface as a class-vtable pointer pair.
-#define interface(Interface, vtable_def)                                       \
-    typedef struct vtable_def Interface##_vtable;                              \
-    typedef struct {                                                           \
-        void *super;                                                           \
-        Interface##_vtable *vtable;                                            \
-    } Interface;
+// Gets a virtual constant from the vtable.
+#define vget(self, name) self->vtable->name
 
 // Defines an implementation of an interface.
 #define impl(Class, Interface, vtable_impl)                                      \

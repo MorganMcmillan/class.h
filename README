@@ -1,0 +1,153 @@
+# class.h: header only OOP library in C
+
+`class.h` is a single file which adds OOP features to C, such as classes, inheritence, getters/setters, interfaces, and polymorphism.
+
+`class.h` is entirely macro-based, as it has to effectively add new syntax to C.
+
+## Guide
+
+To use `class.h`, simply copy it to your project and include it in your files.
+
+```c
+#include "class.h"
+```
+
+**Classes** are defined using the `class` macro. These are just a convenience wrapper around `typedef struct`.
+
+```c
+class(Person, {
+    char *name;
+    char *address;
+    unsigned int phone_number;
+});
+```
+
+**Constructors** are used to create new instances of a class, however unlike in C++, these *return* the class, rather than initializing its fields.
+
+```c
+constructor(Person, char *name, char *address, unsigned int phone_number) {
+    return (Person) {
+        name,
+        address,
+        phone_number
+    };
+}
+```
+
+The reason constructors return a new instance is because it helps avoid leaving fields uninitialized.
+
+**Methods** are defined with `method` or `method0`. They way these work is they declare a function whose name is the format of the class name followed by an `_` and the method name, and define the first argument to be `Class *self` as a convenience.
+
+Note that the "0" on `method0` means "this macro takes in zero extra arguments, which is used to avoid a syntax error. If you're using a method and it complains that it expects a list, try the "0" variant.
+
+```c
+bool method(Person, lives_nearby, char *address, unsigned int area_code) {
+    return in_area(self->address, address) || has_area_code(self->phone_number, area_code);
+}
+
+void method0(Person, print_info) {
+    printf("Name: %s, Address: %s, Phone Number: %d\n", self->name, self->address, self->phone_number);
+}
+```
+
+While C provides little control on whether class fields are visible, you can define **getters and setters** to encourage people away from raw field access.
+
+```c
+// Important: no ending semicolon for default.
+default_getter(Person, name, char *)
+
+default_getter(Person, address, char *)
+default_setter(Person, address, char *)
+
+// Getters can return any type
+getter(Person, phone_number, char *) {
+    return format_phone_number(self->phone_number);
+}
+```
+
+Note: use `getter` and `setter` for forward-declaration.
+
+**Inheritence** is done a bit more manually. To start, you have to name the first field in your class `super`, with its type being the superclass. To call a superclass's method, you either have to downcast the instance to a pointer to the superclass, or (more conveniently) call the `downcast` macro.
+
+```c
+class(Employee, {
+    Person super;
+    char *department;
+});
+
+void method0(Employee, print_info) {
+    // Pointer downcast
+    Person_print_info((Person *) self);
+
+    // Macro downcast
+    Person_print_info(downcast(self));
+    // Which simply expands into...
+    Person_print_info(&(self->super));
+}
+```
+
+**Polymorphism** is done with **interfaces**. Interfaces are created using "virtual tables", which are structs containing pointers to functions and other information.
+
+To define an interface, use `interface`, and define each virtual method with `return_type virtual`/`virtual0`. Then, define "method" for the interface, which simply use `vcall`/`vcall0`.
+
+```c
+interface(Callable, {
+    bool virtual(leave_message, char *message);
+});
+
+bool method(Callable, leave_message, char *message) {
+    return vcall(self, leave_message, message);
+}
+```
+
+To implement an interface for a class, define the method implementations for the interface, then use `impl(Class, interface, vtable)`, making sure to cast each method using `vcast`
+
+```c
+class(AnsweringMachine, {
+    unsigned int phone_number;
+    char *last_message;
+});
+
+bool method(AnsweringMachine, leave_message, char *message) {
+    self->last_message = message;
+    return true;
+}
+
+bool method(Person, leave_message, char *message) {
+    // If nearby, then they can pick up.
+    return Person_lives_nearby(self, ADDRESS, PHONE_NUMBER);
+}
+
+impl(Person, Callable, {
+    vcast(Person_leave_message, bool, char*)
+});
+
+impl(AnsweringMachine, Callable, {
+    vcast(AnsweringMachine_leave_message, bool, char*)
+});
+```
+
+Interface instances are created with `dyn`. An instance contains both a pointer to the concrete data and a pointer to the vtable. Then, you can simply call the interface's method like you would with a class.
+
+Important: `dyn` requires a pointer to its data. Either use an address or `malloc`.
+
+```c
+
+int main() {
+    Person p = Person_create("John", "123 Eve St", 123456789);
+    AnsweringMachine a = (AnsweringMachine) {
+        phone_number = 0,
+        last_message = "no new messages."
+    };
+
+    Callable c[2] = {
+        dyn(Callable, Person, &a),
+        dyn(Callable, AnsweringMachine, &a),
+    };
+
+    for (int i = 0; i < 2; i++) {
+        Callable_leave_message(&c[i], "Annoying telemarketer message");
+    }
+
+    return 0;
+}
