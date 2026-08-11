@@ -8,55 +8,59 @@
 // --------------------
 
 // Semantic wrapper for defining a class
-#define class(Cls, fields) typedef struct fields Cls;
+#define class(Class, fields) typedef struct fields Class;
 
 // Defines a class constructor
 // Expected to be followed by a {} function body
-#define constructor(Cls, ...) Cls Cls##_create(__VA_ARGS__)
+#define constructor(Class, ...) Class Class##_create(__VA_ARGS__)
 
 // Defines a class method
 // Expected to be preceded by the return type, and followed by a {} function
 // body.
-#define method(name, Self, ...) Self##_##name(Self *self, __VA_ARGS__)
+#define method(Class, name, ...) Class##_##name(Class *self, __VA_ARGS__)
 
 // Defines a class method without any extra arguments.
-#define method0(name, Self) Self##_##name(Self *self)
+#define method0(Class, name) Class##_##name(Class *self)
 
 // Defines a class destructor.
 // This should free all allocated memory and resources associated with the instance.
-#define destructor(Cls) void Cls##_destroy(Cls *self)
+#define destructor(Class) void Class##_destroy(Class *self)
 
 // Calls the class destructor and then free.
 // Intended for `malloc`'d instances.
-#define delete(Cls, self) Cls##_destroy(self); free(self);
+#define delete(Class, self) Class##_destroy(self); free(self);
 
 // Explicitly downcasts this instance to its superclass.
 #define downcast(name) &(name->super)
 
+// Explicitly downcasts this instance to its nth superclass.
+// For use with multiple inheritance, where superclasses are named `super1`, `super2`, etc.
+#define downcast_n(name, n) &(name->super##n)
+
 // Explicitly downcasts one pointer type to another.
-#define downcast_ptr(Cls, name) (Cls *)name
+#define downcast_ptr(Class, name) (Class *)name
 
 // Explicitly downcasts one pointer type to another, and assigns it to a new
 // variable.
-#define downcast_declare(Cls, name, new_name) Cls *new_name = (Cls *)name
+#define downcast_declare(Class, name, new_name) Class *new_name = (Class *)name
 
 // --------------------
 // Getters and setters
 // --------------------
 
 // Defines a getter method.
-#define getter(Cls, name, type) type Cls##_get_##name(Cls *self)
+#define getter(Class, name, type) type Class##_get_##name(Class *self)
 
 // Defines a setter method.
-#define setter(Cls, name, type) void Cls##_set_##name(Cls *self, type value)
+#define setter(Class, name, type) void Class##_set_##name(Class *self, type value)
 
 // Defines a default getter method.
 // Do not add a semicolon, this is a function definition.
-#define default_getter(Cls, name, type) type Cls##_get_##name(Cls *self) { return self->name; }
+#define default_getter(Class, name, type) type Class##_get_##name(Class *self) { return self->name; }
 
 // Defines a default setter method.
 // Do not add a semicolon, this is a function definition.
-#define default_setter(Cls, name, type) void Cls##_set_##name(Cls *self, type value) { self->name = value; }
+#define default_setter(Class, name, type) void Class##_set_##name(Class *self, type value) { self->name = value; }
 
 // --------------------
 // Interfaces and virtual methods
@@ -89,13 +93,13 @@
     } Interface;
 
 // Defines an implementation of an interface.
-#define impl(Cls, Interface, vtable_impl)                                      \
-    Interface##_vtable Cls##_##Interface##_vtable =                            \
+#define impl(Class, Interface, vtable_impl)                                      \
+    Interface##_vtable Class##_##Interface##_vtable =                            \
         (Interface##_vtable)vtable_impl
 
 // Creates an instance of an interface.
 // This is similar to Rust's `dyn` keyword, which creates a trait object from a concrete type.
-#define dyn(Interface, Cls, value)                                             \
-    (Interface) { .super = value, .vtable = &Cls##_##Interface##_vtable }
+#define dyn(Interface, Class, value)                                             \
+    (Interface) { .super = value, .vtable = &Class##_##Interface##_vtable }
 
 #endif /* CLASS_H */
