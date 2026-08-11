@@ -1,4 +1,4 @@
-#include "class.h"
+#include "../class.h"
 #include <math.h>
 #include <stdio.h>
 #include <sys/select.h>
