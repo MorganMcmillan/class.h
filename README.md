@@ -67,7 +67,7 @@ getter(Person, phone_number, char *) {
 
 Note: use `getter` and `setter` for forward-declaration.
 
-**Inheritence** is done a bit more manually. To start, you have to name the first field in your class `super`, with its type being the superclass. To call a superclass's method, you either have to downcast the instance to a pointer to the superclass, or (more conveniently) call the `downcast` macro.
+**Inheritence** is done a bit more manually. To start, you have to name the first field in your class `super`, with its type being the superclass. To call a superclass's method, you either have to downcast the instance to a pointer to the superclass, or (more conveniently) call the `super()` macro.
 
 ```c
 class(Employee, {
@@ -80,9 +80,12 @@ void method0(Employee, print_info) {
     Person_print_info((Person *) self);
 
     // Macro downcast
-    Person_print_info(downcast(self));
+    Person_print_info(super());
     // Which simply expands into...
-    Person_print_info(&(self->super));
+    Person_print_info(&self->super);
+
+    // For other variables:
+    Person_print_info(downcast(person));
 }
 ```
 

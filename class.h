@@ -52,6 +52,14 @@
 
 #define method0(Class, name) Class##_##name(Class *self)
 
+// Downcasts pointer of `self` to its superclass.
+
+#define super() &self->super
+//
+// Downcasts pointer of `self` to its nth superclass.
+
+#define super_n(n) &self->super##n
+
 // Explicitly downcasts this instance to its superclass.
 
 #define downcast(name) &((name)->super)
@@ -60,7 +68,7 @@
 // For use with multiple inheritance, where superclasses are named `super1`,
 // `super2`, etc.
 
-#define downcast_n(name, n) &(name->super##n)
+#define downcast_n(name, n) &((name)->super##n)
 
 // Explicitly downcasts one pointer type to another.
 
@@ -69,7 +77,7 @@
 // Explicitly downcasts one pointer type to another, and assigns it to a new
 // variable.
 
-#define downcast_declare(Class, name, new_name) Class *new_name = (Class *)name
+#define downcast_declare(Class, new_name, name) Class *new_name = (Class *)name
 
 // --------------------
 // Getters and setters
@@ -135,15 +143,25 @@
 
 #define vcall0(self, name) (*self->vtable->name)((void *)self->super)
 
+// Calls a virtual method as the interface, not the inner data.
+
+#define vcall_dyn(self, name, ...)                                             \
+    (*self->vtable->name)((void *)self, __VA_ARGS__)
+
+// Calls a virtual method as the interface, not the inner data,
+// without any extra argumens.
+
+#define vcall_dyn0(self, name) (*self->vtable->name)((void *)self)
+
 // Gets a virtual constant from the vtable.
 
 #define vget(self, name) self->vtable->name
 
 // Defines an implementation of an interface.
 
-#define impl(Class, Interface, vtable_impl)                                    \
+#define impl(Class, Interface, ...)                                            \
     Interface##_vtable Class##_##Interface##_vtable =                          \
-        (Interface##_vtable)vtable_impl
+        (Interface##_vtable)__VA_ARGS__
 
 // Creates an instance of an interface.
 // This is similar to Rust's `dyn` keyword, which creates a trait object from a
