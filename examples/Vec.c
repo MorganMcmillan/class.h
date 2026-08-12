@@ -1,8 +1,13 @@
+#ifndef VEC_C
+#define VEC_C
+
 #include "../class.h"
 #include <stdlib.h>
+#include <string.h>
 
-/// @brief A vector class that can hold arbitrary data. It is a dynamic array that can grow and shrink as needed.
-/// It is generic in that it looks at data as only bytes, and does not care about the type of data it holds.
+/// @brief A vector class that can hold arbitrary data. It is a dynamic array
+/// that can grow and shrink as needed. It is generic in that it looks at data
+/// as only bytes, and does not care about the type of data it holds.
 class(Vec, {
     char *data;
     // In bytes
@@ -11,16 +16,12 @@ class(Vec, {
     size_t capacity;
 });
 
-constructor(Vec) {
-    return (Vec) {malloc(0), 0, 0};
-}
+constructor(Vec) { return (Vec){malloc(0), 0, 0}; }
 
-destructor(Vec) {
-    free(self->data);
-}
+destructor(Vec) { free(self->data); }
 
 Vec Vec_with_capacity(size_t capacity) {
-    return (Vec) {malloc(capacity), 0, capacity};
+    return (Vec){malloc(capacity), 0, capacity};
 }
 
 Vec method0(Vec, clone) {
@@ -30,10 +31,11 @@ Vec method0(Vec, clone) {
     return result;
 }
 
-/// @brief Pushes a value of `size` bytes from `data` onto the end of the vector.
+/// @brief Pushes a value of `size` bytes from `data` onto the end of the
+/// vector.
 /// @param self
-/// @param data 
-/// @param size 
+/// @param data
+/// @param size
 void method(Vec, push, void *data, size_t size) {
     if (self->length + size >= self->capacity) {
         self->capacity = (self->capacity == 0) ? size : self->capacity * 2;
@@ -43,10 +45,11 @@ void method(Vec, push, void *data, size_t size) {
     self->length += size;
 }
 
-/// @brief Pops a value of `size` bytes from the end and into `buf`. Returns 0 on success, -1 if the vector is too small to pop the value.
+/// @brief Pops a value of `size` bytes from the end and into `buf`. Returns 0
+/// on success, -1 if the vector is too small to pop the value.
 /// @param self
-/// @param buf 
-/// @param size 
+/// @param buf
+/// @param size
 /// @return error code
 int method(Vec, pop, void *buf, size_t size) {
     if (self->length < size) {
@@ -58,11 +61,13 @@ int method(Vec, pop, void *buf, size_t size) {
     }
 }
 
-/// @brief Gets a pointer to the value at `index` of `size` bytes. The index is the same as an array index
+/// @brief Gets a pointer to the value at `index` of `size` bytes. The index is
+/// the same as an array index
 /// @param self
-/// @param index 
-/// @param size 
-/// @return the memory pointed to by index, or NULL if the index is out of bounds.
+/// @param index
+/// @param size
+/// @return the memory pointed to by index, or NULL if the index is out of
+/// bounds.
 char *method(Vec, get, size_t index, size_t size) {
     index *= size;
     if (index + size > self->length) {
@@ -83,14 +88,14 @@ Vec method(Vec, concatenate, Vec *other) {
     return result;
 }
 
-void method0(Vec, clear) {
-    self->length = 0;
-}
+void method0(Vec, clear) { self->length = 0; }
 
-size_t method(Vec, len, size_t size) {
-    return self->length * size;
-}
+size_t method(Vec, len, size_t size) { return self->length * size; }
 
-size_t method(Vec, capacity, size_t size) {
-    return self->capacity * size;
-}
+size_t method(Vec, capacity, size_t size) { return self->capacity * size; }
+
+#define Vec_foreach(Type, it, vec)                                             \
+    for (Type *it = vec->data; it < vec->data + (vec->length * sizeof(Type));  \
+         it++)
+
+#endif

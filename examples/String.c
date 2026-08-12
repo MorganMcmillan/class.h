@@ -2,25 +2,17 @@
 #include "Vec.c"
 #include <string.h>
 
-class(String, {
-    Vec super;
-});
+class(String, { Vec super; });
 
-constructor(String) {
-    return (String) {create(Vec)};
-}
+constructor(String) { return (String){create(Vec)}; }
 
-destructor(String) {
-    delete(Vec, downcast(self));
-}
+destructor(String) { delete(Vec, downcast(self)); }
 
 String String_with_capacity(size_t capacity) {
-    return (String) {Vec_with_capacity(capacity)};
+    return (String){Vec_with_capacity(capacity)};
 }
 
-String method0(String, clone) {
-    return (String) {Vec_clone(downcast(self))};
-}
+String method0(String, clone) { return (String){Vec_clone(downcast(self))}; }
 
 void method(String, push_char, char c) {
     Vec_push(downcast(self), &c, sizeof(char));
@@ -42,12 +34,10 @@ char method0(String, pop_char) {
 }
 
 String method(String, concatenate, String *other) {
-    Vec_concatenate(downcast(self), downcast(other));
+    return (String){Vec_concatenate(downcast(self), downcast(other))};
 }
 
-size_t method0(String, len) {
-    return Vec_len(downcast(self), sizeof(char));
-}
+size_t method0(String, len) { return Vec_len(downcast(self), sizeof(char)); }
 
 size_t method0(String, capacity) {
     return Vec_capacity(downcast(self), sizeof(char));
@@ -68,7 +58,8 @@ char *method(String, first_char, char c) {
     return memchr(self->super.data, c, String_len(self));
 }
 
-/// @brief Converts the String into a C string with a null terminator. This string is still valid, just remember to call `pop_char` to remove it.
+/// @brief Converts the String into a C string with a null terminator. This
+/// string is still valid, just remember to call `pop_char` to remove it.
 char *method0(String, into_c_string) {
     String_push_char(self, '\0');
     return self->super.data;

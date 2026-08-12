@@ -17,7 +17,8 @@
 #define constructor(Class, ...) Class Class##_create(__VA_ARGS__)
 
 // Defines a class destructor.
-// This should free all allocated memory and resources associated with the instance.
+// This should free all allocated memory and resources associated with the
+// instance.
 
 #define destructor(Class) void Class##_destroy(Class *self)
 
@@ -25,21 +26,21 @@
 
 #define create(Class, ...) Class##_create(__VA_ARGS__)
 
-// Creates a new instance of `Class` from a constructor on the stack,
-// without any extra arguments.
+// Alternative form of create. Unlike C++, this allocates on the heap, not the
+// stack.
 
-#define create0(Class) Class##_create()
+#define new(Class, ...) Class##_create(__VA_ARGS__)
 
 // Calls the class destructor.
-// Also ensures that the value cannot be used after.
 
-#define delete(Class, self) Class##_destroy(self); (void)self
+#define delete(Class, self) Class##_destroy(self)
 
 // Calls the class destructor and then free.
-// Also ensures that the value cannot be used after.
 // Used with classes that are allocated on the heap.
 
-#define delete_and_free(Class, self) Class##_destroy(self); free(self); (void)self
+#define delete_and_free(Class, self)                                           \
+    Class##_destroy(self);                                                     \
+    free(self)
 
 // Defines a class method
 // Expected to be preceded by the return type, and followed by a {} function
@@ -56,7 +57,8 @@
 #define downcast(name) &((name)->super)
 
 // Explicitly downcasts this instance to its nth superclass.
-// For use with multiple inheritance, where superclasses are named `super1`, `super2`, etc.
+// For use with multiple inheritance, where superclasses are named `super1`,
+// `super2`, etc.
 
 #define downcast_n(name, n) &(name->super##n)
 
@@ -79,17 +81,20 @@
 
 // Defines a setter method.
 
-#define setter(Class, name, type) void Class##_set_##name(Class *self, type value)
+#define setter(Class, name, type)                                              \
+    void Class##_set_##name(Class *self, type value)
 
 // Defines a default getter method.
 // Do not add a semicolon, this is a function definition.
 
-#define default_getter(Class, name, type) type Class##_get_##name(Class *self) { return self->name; }
+#define default_getter(Class, name, type)                                      \
+    type Class##_get_##name(Class *self) { return self->name; }
 
 // Defines a default setter method.
 // Do not add a semicolon, this is a function definition.
 
-#define default_setter(Class, name, type) void Class##_set_##name(Class *self, type value) { self->name = value; }
+#define default_setter(Class, name, type)                                      \
+    void Class##_set_##name(Class *self, type value) { self->name = value; }
 
 // --------------------
 // Interfaces and virtual methods
@@ -138,14 +143,15 @@
 
 // Defines an implementation of an interface.
 
-#define impl(Class, Interface, vtable_impl)                                      \
-    Interface##_vtable Class##_##Interface##_vtable =                            \
+#define impl(Class, Interface, vtable_impl)                                    \
+    Interface##_vtable Class##_##Interface##_vtable =                          \
         (Interface##_vtable)vtable_impl
 
 // Creates an instance of an interface.
-// This is similar to Rust's `dyn` keyword, which creates a trait object from a concrete type.
+// This is similar to Rust's `dyn` keyword, which creates a trait object from a
+// concrete type.
 
-#define dyn(Interface, Class, value)                                             \
+#define dyn(Interface, Class, value)                                           \
     (Interface) { .super = value, .vtable = &Class##_##Interface##_vtable }
 
 #endif /* CLASS_H */
