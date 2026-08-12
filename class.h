@@ -85,13 +85,11 @@
     void Class##_set_##name(Class *self, type value)
 
 // Defines a default getter method.
-// Do not add a semicolon, this is a function definition.
 
 #define default_getter(Class, name, type)                                      \
     type Class##_get_##name(Class *self) { return self->name; }
 
 // Defines a default setter method.
-// Do not add a semicolon, this is a function definition.
 
 #define default_setter(Class, name, type)                                      \
     void Class##_set_##name(Class *self, type value) { self->name = value; }

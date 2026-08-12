@@ -20,6 +20,10 @@ constructor(Vec) { return (Vec){malloc(0), 0, 0}; }
 
 destructor(Vec) { free(self->data); }
 
+default_getter(Vec, data, char *);
+default_getter(Vec, length, size_t);
+default_getter(Vec, capacity, size_t);
+
 Vec Vec_with_capacity(size_t capacity) {
     return (Vec){malloc(capacity), 0, capacity};
 }
@@ -89,10 +93,6 @@ Vec method(Vec, concatenate, Vec *other) {
 }
 
 void method0(Vec, clear) { self->length = 0; }
-
-size_t method(Vec, len, size_t size) { return self->length * size; }
-
-size_t method(Vec, capacity, size_t size) { return self->capacity * size; }
 
 #define Vec_foreach(Type, it, vec)                                             \
     for (Type *it = vec->data; it < vec->data + (vec->length * sizeof(Type));  \
