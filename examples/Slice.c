@@ -25,23 +25,23 @@ Slice method(Slice, subslice, size_t start_index, size_t end_index,
 
     if (start_offset >= self->length || end_offset >= self->length ||
         end_offset < start_offset) {
-        return new(Slice, NULL, 0);
+        return Slice_new(NULL, 0);
     }
 
     size_t length = end_offset - start_offset;
-    return new(Slice, self->data + start_offset, length);
+    return Slice_new(self->data + start_offset, length);
 }
 
 Slice method(Slice, subslice_start, size_t start_index, size_t size) {
     size_t start_offset = start_index * size;
     if (start_offset >= self->length) {
-        return new(Slice, NULL, 0);
+        return Slice_new(NULL, 0);
     }
 
     size_t length = self->length - start_offset;
-    return new(Slice, self->data + start_offset, length);
+    return Slice_new(self->data + start_offset, length);
 }
 
 Slice method(Slice, from_str, char *str) {
-    return new(Slice, str, strlen(str));
+    return Slice_new(str, strlen(str));
 }

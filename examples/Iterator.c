@@ -1,18 +1,9 @@
+#include "Iterator.h"
 #include "../class.h"
 #include "Slice.c"
 #include "Vec.c"
 #include <stddef.h>
 #include <stdlib.h>
-
-interface(Iterator, {
-    void *virtual0(next);
-    size_t virtual0(item_size);
-});
-
-// I would recommend to create your own `impl_Interface` macros
-#define impl_Iterator(Class)                                                   \
-    impl(Class, Iterator,                                                      \
-         {vcast0(Class##_next, void *), vcast0(Class##_item_size, size_t)});
 
 void *method0(Iterator, next) { return vcall0(self, next); }
 
@@ -38,13 +29,6 @@ void method(Iterator, reduce, void *state,
     }
 }
 
-class(Range, {
-    size_t start;
-    size_t end;
-    size_t step;
-    size_t prev;
-});
-
 constructor(Range, size_t start, size_t end, size_t step) {
     return (Range){start, end, step, 0};
 }
@@ -62,15 +46,6 @@ void *method0(Range, next) {
 size_t method0(Range, item_size) { return sizeof(size_t); }
 
 impl_Iterator(Range);
-
-// Maps an item of one type to another. Works by writing the function's output
-// to a buffer of `item_size` size.
-class(IterMap, {
-    Iterator super;
-    void (*fn)(const void *item, void *output);
-    size_t item_size;
-    void *output;
-});
 
 constructor(IterMap, Iterator iterator, void (*fn)(const void *, void *),
             size_t item_size) {
@@ -91,10 +66,9 @@ size_t method0(IterMap, item_size) { return self->item_size; }
 
 impl_Iterator(IterMap);
 
-class(IterFilter, {
-    Iterator super;
-    int (*predicate)(void *);
-});
+constructor(IterFilter, Iterator iterator, int (*predicate)(void *)) {
+    return (IterFilter) {iterator, predicate};
+}
 
 void *method0(IterFilter, next) {
     void *item = Iterator_next(super());
@@ -113,10 +87,9 @@ size_t method0(IterFilter, item_size) { return Iterator_item_size(super()); }
 
 impl_Iterator(IterFilter);
 
-class(Take, {
-    Iterator super;
-    size_t limit;
-});
+constructor(Take, Iterator iterator, size_t limit) {
+    return (Take){iterator, limit};
+}
 
 void *method0(Take, next) {
     void *item = Iterator_next(super());
@@ -132,10 +105,9 @@ size_t method0(Take, item_size) { return Iterator_item_size(super()); }
 
 impl_Iterator(Take);
 
-class(Drop, {
-    Iterator super;
-    size_t limit;
-});
+constructor(Drop, Iterator iterator, size_t limit) {
+    return (Drop){iterator, limit};
+}
 
 void *method0(Drop, next) {
     void *item = Iterator_next(super());
@@ -149,27 +121,18 @@ void *method0(Drop, next) {
 
 size_t method0(Drop, item_size) { return Iterator_item_size(super()); }
 
-impl_Iterator(Drop);
+impl_Iterator(Drop)
 
-class(IterSlice, {
-    Slice *slice;
-    size_t current_index;
-    size_t size;
-});
-
-constructor(IterSlice, Slice *slice, size_t size) {
-    return (IterSlice){slice, 0, size};
+constructor(SliceIter, Slice *slice, size_t size) {
+    return (SliceIter){slice, 0, size};
 }
 
-void *method0(IterSlice, next) {
+void *method0(SliceIter, next) {
     void *item = Slice_get(self->slice, self->current_index, self->size);
     self->current_index++;
     return item;
 }
 
-size_t method0(IterSlice, item_size) { return self->size; }
+size_t method0(SliceIter, item_size) { return self->size; }
 
-impl_Iterator(IterSlice);
-
-#define foreach(item, iter) while ((item = Iterator_next(iter)) != NULL)
-#define foreach_c(Class, item, iter) while ((item = Class##_next(iter)) != NULL)
+impl_Iterator(SliceIter);

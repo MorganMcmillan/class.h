@@ -153,10 +153,14 @@
 
 #define vget(self, name) self->vtable->name
 
+// Foreward declares an implementation of an interface.
+
+#define declare_impl(Class, Interface) Interface##_vtable Class##_##Interface##_vtable
+
 // Defines an implementation of an interface.
 
 #define impl(Class, Interface, ...)                                            \
-    Interface##_vtable Class##_##Interface##_vtable =                          \
+    Class##_##Interface##_vtable =                          \
         (Interface##_vtable)__VA_ARGS__
 
 // Creates an instance of an interface.

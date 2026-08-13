@@ -1,10 +1,9 @@
 #include "../class.h"
-#include "Slice.c"
-#include "String.c"
+#include "File.h"
+#include "Slice.h"
+#include "String.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-class(File, { FILE *file; });
 
 constructor(File, const char *filename, const char *mode) {
     return (File){fopen(filename, mode)};
