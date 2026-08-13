@@ -50,21 +50,21 @@
 
 // Downcasts pointer of `self` to its superclass.
 
-#define super() &self->super
+#define super() (&self->super)
 //
 // Downcasts pointer of `self` to its nth superclass.
 
-#define super_n(n) &self->super##n
+#define super_n(n) (&self->super##n)
 
 // Explicitly downcasts this instance to its superclass.
 
-#define downcast(name) &((name)->super)
+#define downcast(name) (&((name)->super))
 
 // Explicitly downcasts this instance to its nth superclass.
 // For use with multiple inheritance, where superclasses are named `super1`,
 // `super2`, etc.
 
-#define downcast_n(name, n) &((name)->super##n)
+#define downcast_n(name, n) (&((name)->super##n))
 
 // Explicitly downcasts one pointer type to another.
 
@@ -160,8 +160,8 @@
         (Interface##_vtable)__VA_ARGS__
 
 // Creates an instance of an interface.
-// This is similar to Rust's `dyn` keyword, which creates a trait object from a
-// concrete type.
+// This is similar to Rust's `dyn` keyword, which describes a type of trait
+// object.
 
 #define dyn(Interface, Class, value)                                           \
     (Interface) { .super = value, .vtable = &Class##_##Interface##_vtable }

@@ -1,31 +1,27 @@
 #include "../class.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include "Vec.c"
+#include "Slice.c"
 #include "String.c"
+#include <stdio.h>
+#include <stdlib.h>
 
-class(File, {
-    FILE *file;
-});
+class(File, { FILE *file; });
 
 constructor(File, const char *filename, const char *mode) {
-    return (File) {fopen(filename, mode)};
+    return (File){fopen(filename, mode)};
 }
 
-destructor(File) {
-    fclose(self->file);
-}
+destructor(File) { fclose(self->file); }
 
 void method(File, write, char *data, size_t length) {
     fwrite(data, sizeof(char), length, self->file);
 }
 
-void method(File, write_vec, Vec *vec) {
-    File_write(self, vec->data, vec->length);
+void method(File, write_slice, Slice *slice) {
+    File_write(self, slice->data, slice->length);
 }
 
 void method(File, write_string, String *str) {
-    File_write_vec(self, downcast(str));
+    File_write_slice(self, downcast(downcast(str)));
 }
 
 size_t method(File, read, char *buffer, size_t length) {
@@ -51,6 +47,4 @@ int method(File, seek, long offset, int whence) {
     return fseek(self->file, offset, whence);
 }
 
-void method0(File, flush) {
-    fflush(self->file);
-}
+void method0(File, flush) { fflush(self->file); }

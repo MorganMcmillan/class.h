@@ -1,16 +1,8 @@
-#ifndef SLICE_C
-#define SLICE_C
-
+#include "Slice.h"
 #include "../class.h"
-#include "Vec.c"
 #include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
-
-class(Slice, {
-    char *data;
-    // In bytes
-    size_t length;
-});
 
 constructor(Slice, char *data, size_t length) { return (Slice){data, length}; }
 
@@ -53,11 +45,3 @@ Slice method(Slice, subslice_start, size_t start_index, size_t size) {
 Slice method(Slice, from_str, char *str) {
     return new(Slice, str, strlen(str));
 }
-
-Vec method0(Slice, to_vec) {
-    Vec result = Vec_with_capacity(self->length);
-    Vec_push(&result, self->data, self->length);
-    return result;
-}
-
-#endif
