@@ -14,7 +14,7 @@
 // Defines a class constructor
 // Expected to be followed by a {} function body
 
-#define constructor(Class, ...) Class Class##_create(__VA_ARGS__)
+#define constructor(Class, ...) Class Class##_new(__VA_ARGS__)
 
 // Defines a class destructor.
 // This should free all allocated memory and resources associated with the
@@ -22,14 +22,10 @@
 
 #define destructor(Class) void Class##_destroy(Class *self)
 
-// Creates a new instance of `Class` from a constructor on the stack.
+// Alternative to calling `Class_new`. Unlike C++, this allocates on the heap,
+// not the stack.
 
-#define create(Class, ...) Class##_create(__VA_ARGS__)
-
-// Alternative form of create. Unlike C++, this allocates on the heap, not the
-// stack.
-
-#define new(Class, ...) Class##_create(__VA_ARGS__)
+#define new(Class, ...) Class##_new(__VA_ARGS__)
 
 // Calls the class destructor.
 

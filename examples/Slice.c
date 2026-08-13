@@ -14,6 +14,9 @@ class(Slice, {
 
 constructor(Slice, char *data, size_t length) { return (Slice){data, length}; }
 
+// Use only when the slice's data is heap-allocated.
+destructor(Slice) { free(self->data); }
+
 void *method(Slice, get, size_t index, size_t size) {
     size_t offset = index * size;
     if (offset >= self->length) {
