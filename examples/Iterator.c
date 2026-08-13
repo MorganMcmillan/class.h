@@ -18,6 +18,13 @@ Vec method(Iterator, collect_vec, size_t size) {
     return vec;
 }
 
+void method(Iterator, foreach, void (*fn)(void *)) {
+    void *item;
+    while ((item = Iterator_next(self)) != NULL) {
+        fn(item);
+    }
+}
+
 // Calls a function repeatedly. The function takes in the mutable state, the
 // current item, and the size of an item.
 void method(Iterator, reduce, void *state,
@@ -67,7 +74,7 @@ size_t method0(IterMap, item_size) { return self->item_size; }
 impl_Iterator(IterMap);
 
 constructor(IterFilter, Iterator iterator, int (*predicate)(void *)) {
-    return (IterFilter) {iterator, predicate};
+    return (IterFilter){iterator, predicate};
 }
 
 void *method0(IterFilter, next) {
@@ -121,7 +128,7 @@ void *method0(Drop, next) {
 
 size_t method0(Drop, item_size) { return Iterator_item_size(super()); }
 
-impl_Iterator(Drop)
+impl_Iterator(Drop);
 
 constructor(SliceIter, Slice *slice, size_t size) {
     return (SliceIter){slice, 0, size};

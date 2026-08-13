@@ -13,7 +13,8 @@ interface(Iterator, {
 });
 
 // I would recommend to create your own `impl_Interface` macros.
-// Usage of these belongs in the header, since the vtable needs to be made global
+// Usage of these belongs in the header, since the vtable needs to be made
+// global
 #define impl_Iterator(Class)                                                   \
     impl(Class, Iterator,                                                      \
          {vcast0(Class##_next, void *), vcast0(Class##_item_size, size_t)});
@@ -26,8 +27,7 @@ Vec method(Iterator, collect_vec, size_t size);
 
 // Calls a function repeatedly. The function takes in the mutable state, the
 // current item, and the size of an item.
-void method(Iterator, reduce, void *state,
-            void *(*fn)(void *, void *, size_t));
+void method(Iterator, reduce, void *state, void *(*fn)(void *, void *, size_t));
 
 class(Range, {
     size_t start;
@@ -117,5 +117,7 @@ declare_impl(SliceIter, Iterator);
 
 #define foreach(item, iter) while ((item = Iterator_next(iter)) != NULL)
 #define foreach_c(Class, item, iter) while ((item = Class##_next(iter)) != NULL)
+
+void method(Iterator, foreach, void (*fn)(void *));
 
 #endif

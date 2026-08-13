@@ -155,12 +155,13 @@
 
 // Foreward declares an implementation of an interface.
 
-#define declare_impl(Class, Interface) Interface##_vtable Class##_##Interface##_vtable
+#define declare_impl(Class, Interface)                                         \
+    extern Interface##_vtable Class##_##Interface##_vtable
 
 // Defines an implementation of an interface.
 
 #define impl(Class, Interface, ...)                                            \
-    Class##_##Interface##_vtable =                          \
+    Interface##_vtable Class##_##Interface##_vtable =                          \
         (Interface##_vtable)__VA_ARGS__
 
 // Creates an instance of an interface.
