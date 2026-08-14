@@ -11,7 +11,7 @@ size_t method0(Iterator, item_size) { return vcall0(self, item_size); }
 
 Vec method(Iterator, collect_vec, size_t size) {
     void *item;
-    Vec vec = new(Vec);
+    Vec vec = Vec_new();
     while ((item = Iterator_next(self)) != NULL) {
         Vec_push(&vec, item, size);
     }

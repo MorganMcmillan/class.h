@@ -3,7 +3,7 @@
 #include "Vec.h"
 #include <string.h>
 
-constructor(String) { return (String){Vec_new()}; }
+constructor0(String) { return (String){Vec_new()}; }
 
 destructor(String) { delete(Vec, super()); }
 

@@ -18,9 +18,7 @@ Vec2 method(Vec2, sub, Vec2 *other) {
     return Vec2_new(self->x - other->x, self->y - other->y);
 }
 
-Vec2 method(Vec2, scale, int n) {
-    return Vec2_new(self->x * n, self->y * n);
-}
+Vec2 method(Vec2, scale, int n) { return Vec2_new(self->x * n, self->y * n); }
 
 double method0(Vec2, distance) {
     return sqrt((double)(self->x * self->x + self->y * self->y));
@@ -46,8 +44,8 @@ Vec3 method(Vec3, add, Vec3 *other) {
 }
 
 double method0(Vec3, distance) {
-    return sqrt((double)(super()->x * super()->x +
-                         super()->y * super()->y + self->z * self->z));
+    return sqrt((double)(super()->x * super()->x + super()->y * super()->y +
+                         self->z * self->z));
 }
 
 interface(Distance, { double virtual0(distance); });
@@ -58,7 +56,7 @@ impl(Vec2, Distance, {vcast0(Vec2_distance, double)});
 
 impl(Vec3, Distance, {vcast0(Vec3_distance, double)});
 
-int main() {
+int main(void) {
     Vec2 vec2 = Vec2_new(5, 10);
     printf("Vec2 distance: %f\n", Vec2_distance(&vec2));
     Vec3 vec3 = Vec3_from_vec2(vec2, 15);

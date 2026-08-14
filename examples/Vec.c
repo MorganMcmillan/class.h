@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-constructor(Vec) { return (Vec){malloc(0), 0, 0}; }
+constructor(Vec) { return (Vec){{malloc(0), 0}, 0}; }
 
 destructor(Vec) { free(super()->data); }
 
@@ -11,7 +11,7 @@ getter(Vec, length, size_t) { return super()->length; }
 default_getter(Vec, capacity, size_t);
 
 Vec Vec_with_capacity(size_t capacity) {
-    return (Vec){malloc(capacity), 0, capacity};
+    return (Vec){{malloc(capacity), 0}, capacity};
 }
 
 Vec method0(Vec, clone) {

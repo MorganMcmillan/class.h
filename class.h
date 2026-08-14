@@ -1,20 +1,26 @@
 #ifndef CLASS_H
 #define CLASS_H
 
-// Note: this library makes liberal use of an implicit self.
+// Note: this library makes heavy use of an implicit self.
+// `self` is always a pointer to the class/interface.
 
 // --------------------
 // Classes
 // --------------------
 
-// Semantic wrapper for defining a class
+// Semantic wrapper for defining a class.
 
-#define class(Class, fields) typedef struct fields Class;
+#define class(Class, fields) typedef struct fields Class
 
-// Defines a class constructor
-// Expected to be followed by a {} function body
+// Defines a class constructor.
+// Expected to be followed by a {} function body.
 
 #define constructor(Class, ...) Class Class##_new(__VA_ARGS__)
+
+// Defines a class constructor without any extra arguments
+// Expected to be followed by a {} function body.
+
+#define constructor0(Class) Class Class##_new(void)
 
 // Defines a class destructor.
 // This should free all allocated memory and resources associated with the
@@ -109,7 +115,7 @@
     typedef struct {                                                           \
         void *super;                                                           \
         Interface##_vtable *vtable;                                            \
-    } Interface;
+    } Interface
 
 // Declares/defines a virtual method for a class-vtable pair.
 

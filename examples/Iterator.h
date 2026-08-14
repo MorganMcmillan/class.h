@@ -17,7 +17,7 @@ interface(Iterator, {
 // global
 #define impl_Iterator(Class)                                                   \
     impl(Class, Iterator,                                                      \
-         {vcast0(Class##_next, void *), vcast0(Class##_item_size, size_t)});
+         {vcast0(Class##_next, void *), vcast0(Class##_item_size, size_t)})
 
 void *method0(Iterator, next);
 
